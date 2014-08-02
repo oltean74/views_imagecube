@@ -1,1 +1,11 @@
 name = Views Image Cube
+description = Display a view with Jquery Image Cube 
+core = 7.x
+package = Views
+
+dependencies[]  = views
+dependencies[]  = image
+
+files[] = views_imagecube.views.inc
+files[] = views_imagecube_style_plugin.inc
+files[] = views_imagecube_plugin_row_imagecubefields.inc

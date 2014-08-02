@@ -1,0 +1,86 @@
+<?php
+
+/**
+ * @file
+ * The implementation of Views Image Cube module.
+ */
+
+/**
+ * Implements hook_views_api().
+ */
+function views_imagecube_views_api() {
+  return array('api' => '3');
+}
+
+/**
+ * Implementation of template preprocess for the view.
+ */
+function template_preprocess_views_imagecube_view(&$vars) {
+  $view = $vars['view'];
+  $options = $vars['options'];
+  $vars['width'] = (int) $options['width'];
+  $vars['height'] = (int) $options['height'];
+  $selector_id = array(
+    'cube_id' => drupal_html_id($view->name),
+  );
+  $vars['cubes_id'] = $selector_id['cube_id'];        $effects = array(
+    'direction' => $options['direction'],
+    'selection' => $options['selection'],
+    'speed' => (int) $options['speed'],
+    'pause' => (int) $options['pause'],
+    'expansion' => (int) $options['expansion'],
+    'reduction' => (int) $options['reduction'],
+    'segments' => (int) $options['segments'],
+    'repeat' => $options['repeat'] != 'true' ? TRUE : FALSE,
+    'fullD' => $options['full3D'] == 'true' ? TRUE : FALSE,
+    'shading' => $options['shading'] != 'true' ? TRUE : FALSE,
+    'opacity' => (float) $options['opacity'],
+  );
+
+  drupal_add_js(array('views_imagecube' => $effects), 'setting');
+  drupal_add_js(array('views_imagecube' => $selector_id), 'setting');
+  views_imagecube_add($options);
+}
+
+/**
+ * Implementation of template preprocess for the view fields.
+ */
+function template_preprocess_views_imagecube_view_imagecubefields(&$vars) {
+  $view = & $vars['view'];
+  $options = $vars['options'];
+  $row = $vars['row'];
+  if (is_object($view)) {
+    if (isset($view->field[$options['image_field']])) {
+      if (is_object($view->field[$options['image_field']])) {
+        if (isset($view->field[$options['image_field']]->options['settings']['image_style'])) {
+          $presetname = $view->field[$options['image_field']]->options['settings']['image_style'];
+        }
+      }
+    }
+  }
+
+  foreach ($view->field as $id => $field) {
+    $field_image_name = "field_{$options['image_field']}";
+    if (isset($row->{$field_image_name}[0])) {
+      $image_url = $row->{$field_image_name}[0]['raw']['uri'];
+    }
+  }
+
+  $params = array(
+    'style_name' => isset($presetname) ? $presetname : NULL,
+    'path' => isset($image_url) ? $image_url : NULL,
+  );
+
+  $img = (!$presetname) ? theme('image', $params) : theme('image_style', $params);
+  $vars['content'] = $img;
+}
+
+/**
+ * Add the needed javascript files.
+ */
+function views_imagecube_add($options = array(), $add = TRUE) {
+  $module_path = drupal_get_path('module', 'views_imagecube');
+  drupal_add_js($module_path . '/js/jquery.plugin.min.js');
+  drupal_add_js($module_path . '/js/jquery.imagecube.min.js');
+  drupal_add_js($module_path . '/js/imagecube.js');
+}
