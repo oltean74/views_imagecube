@@ -43,4 +43,3 @@ Drupal.behaviors.views_imagecube = {
 
 
 })(jQuery);
-

@@ -3,7 +3,6 @@
 /**
  * @file
  * Provide the views image cube plugin definition.
- *
  */
 function views_imagecube_views_plugins() {
   return array(
